@@ -1,6 +1,6 @@
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
 import { useTheme } from '../ThemeContext';
 import { Colors } from '../constants/Colors';
 
@@ -19,7 +19,7 @@ export default function NavigationBar({ onMapPress, onProfilePress }: Navigation
       styles.container, 
       { 
         backgroundColor: colors.background,
-        borderBottomColor: darkMode ? '#2D2D2D' : '#F3F4F6'
+        borderBottomColor: darkMode ? '#1A1A1A' : '#F5F5F5'
       }
     ]}>
       {/* Logo */}
@@ -28,7 +28,7 @@ export default function NavigationBar({ onMapPress, onProfilePress }: Navigation
           styles.logoContainer, 
           { backgroundColor: darkMode ? '#1F1F1F' : '#F5F3FF' }
         ]}>
-          <MaterialCommunityIcons name="brain" size={22} color={colors.primary} />
+          <MaterialCommunityIcons name="brain" size={24} color={colors.primary} />
         </View>
         <Text style={[styles.brandName, { color: colors.text }]}>Mentali</Text>
       </View>
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 1,
   },
@@ -91,21 +91,21 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   logoContainer: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   brandName: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '800',
     letterSpacing: -0.5,
   },
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   iconButton: {
     width: 42,

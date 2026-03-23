@@ -1,29 +1,29 @@
 /**
  * Modern Color Palette for Mentali App
- * Clean, minimal, and soothing colors for mental wellness
+ * Professional, clean, and soothing colors for mental wellness
  */
 
 export const Colors = {
   light: {
-    // Primary
+    // Primary - Vibrant Purple
     primary: '#8B5CF6',
     primaryLight: '#A78BFA',
     primaryDark: '#7C3AED',
     
     // Background
-    background: '#FAFAFA',
-    backgroundSecondary: '#F5F3FF',
+    background: '#FFFFFF',
+    backgroundSecondary: '#FAFAFA',
     
     // Text
-    text: '#1F2937',
-    textSecondary: '#6B7280',
+    text: '#111827',
+    textSecondary: '#4B5563',
     textMuted: '#9CA3AF',
     textDark: '#111827',
     
     // Cards & Surfaces
     card: '#FFFFFF',
-    cardBorder: '#E5E7EB',
-    cardShadow: 'rgba(139, 92, 246, 0.08)',
+    cardBorder: '#F0F0F0',
+    cardShadow: 'rgba(0, 0, 0, 0.05)',
     
     // Accent colors
     accent: '#EC4899',
@@ -37,30 +37,30 @@ export const Colors = {
     tabIconDefault: '#9CA3AF',
     tabIconSelected: '#8B5CF6',
     secondaryText: '#6B7280',
-    divider: '#E5E7EB',
+    divider: '#F0F0F0',
     blurBg: 'rgba(139, 92, 246, 0.05)',
     fabGradient: ['#8B5CF6', '#EC4899'],
   },
   dark: {
-    // Primary
+    // Primary - Soft Lavender
     primary: '#A78BFA',
     primaryLight: '#C4B5FD',
     primaryDark: '#8B5CF6',
     
-    // Background
-    background: '#0F0F0F',
-    backgroundSecondary: '#1A1A1A',
+    // Background - True Black for OLED
+    background: '#0A0A0A',
+    backgroundSecondary: '#121212',
     
     // Text
-    text: '#F9FAFB',
+    text: '#F5F5F5',
     textSecondary: '#D1D5DB',
-    textMuted: '#9CA3AF',
+    textMuted: '#6B7280',
     textDark: '#FFFFFF',
     
     // Cards & Surfaces
-    card: '#1A1A1A',
-    cardBorder: '#2D2D2D',
-    cardShadow: 'rgba(0, 0, 0, 0.3)',
+    card: '#161616',
+    cardBorder: '#252525',
+    cardShadow: 'rgba(0, 0, 0, 0.5)',
     
     // Accent colors
     accent: '#F472B6',
@@ -71,11 +71,11 @@ export const Colors = {
     // Legacy compatibility
     tint: '#A78BFA',
     icon: '#A78BFA',
-    tabIconDefault: '#6B7280',
+    tabIconDefault: '#4B5563',
     tabIconSelected: '#A78BFA',
-    secondaryText: '#D1D5DB',
-    divider: '#2D2D2D',
-    blurBg: 'rgba(0, 0, 0, 0.5)',
+    secondaryText: '#9CA3AF',
+    divider: '#252525',
+    blurBg: 'rgba(0, 0, 0, 0.8)',
     fabGradient: ['#8B5CF6', '#EC4899'],
   },
 };

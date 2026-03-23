@@ -8,16 +8,21 @@ import { Colors } from '../constants/Colors';
 
 dayjs.extend(relativeTime);
 
-const EMOTION_CONFIG: Record<string, { color: string; bgColor: string }> = {
-  joy: { color: '#F59E0B', bgColor: '#FFFBEB' },
-  sadness: { color: '#3B82F6', bgColor: '#EFF6FF' },
-  fear: { color: '#8B5CF6', bgColor: '#F5F3FF' },
-  anger: { color: '#EF4444', bgColor: '#FEF2F2' },
-  love: { color: '#EC4899', bgColor: '#FDF2F8' },
-  anxiety: { color: '#F97316', bgColor: '#FFF7ED' },
-  hope: { color: '#10B981', bgColor: '#ECFDF5' },
-  calm: { color: '#6366F1', bgColor: '#EEF2FF' },
-  default: { color: '#8B5CF6', bgColor: '#F5F3FF' },
+const EMOTION_CONFIG: Record<string, { color: string; bgColor: string; gradientColors: string[] }> = {
+  joy: { color: '#F59E0B', bgColor: '#FFFBEB', gradientColors: ['#FCD34D', '#F59E0B'] },
+  sadness: { color: '#3B82F6', bgColor: '#EFF6FF', gradientColors: ['#60A5FA', '#3B82F6'] },
+  fear: { color: '#8B5CF6', bgColor: '#F5F3FF', gradientColors: ['#A78BFA', '#8B5CF6'] },
+  anger: { color: '#EF4444', bgColor: '#FEF2F2', gradientColors: ['#F87171', '#EF4444'] },
+  love: { color: '#EC4899', bgColor: '#FDF2F8', gradientColors: ['#F472B6', '#EC4899'] },
+  anxiety: { color: '#F97316', bgColor: '#FFF7ED', gradientColors: ['#FB923C', '#F97316'] },
+  hope: { color: '#10B981', bgColor: '#ECFDF5', gradientColors: ['#34D399', '#10B981'] },
+  calm: { color: '#6366F1', bgColor: '#EEF2FF', gradientColors: ['#818CF8', '#6366F1'] },
+  gratitude: { color: '#14B8A6', bgColor: '#F0FDFA', gradientColors: ['#2DD4BF', '#14B8A6'] },
+  surprise: { color: '#8B5CF6', bgColor: '#F5F3FF', gradientColors: ['#A78BFA', '#8B5CF6'] },
+  loneliness: { color: '#6B7280', bgColor: '#F9FAFB', gradientColors: ['#9CA3AF', '#6B7280'] },
+  stress: { color: '#F59E0B', bgColor: '#FFFBEB', gradientColors: ['#FCD34D', '#F59E0B'] },
+  motivation: { color: '#10B981', bgColor: '#ECFDF5', gradientColors: ['#34D399', '#10B981'] },
+  default: { color: '#8B5CF6', bgColor: '#F5F3FF', gradientColors: ['#A78BFA', '#8B5CF6'] },
 };
 
 interface ThoughtCardProps {
@@ -85,39 +90,39 @@ export default function ThoughtCard({
     }));
     setReacted(prev => ({ ...prev, [type]: !prev[type] }));
     Animated.sequence([
-      Animated.timing(scales[type], { toValue: 1.3, duration: 100, useNativeDriver: true }),
-      Animated.timing(scales[type], { toValue: 1, duration: 100, useNativeDriver: true }),
+      Animated.timing(scales[type], { toValue: 1.35, duration: 100, useNativeDriver: true }),
+      Animated.timing(scales[type], { toValue: 1, duration: 150, useNativeDriver: true }),
     ]).start();
   };
 
   const REACTIONS = [
-    { key: 'heart', emoji: '❤️' },
-    { key: 'message', emoji: '💬' },
-    { key: 'fire', emoji: '🔥' },
-    { key: 'brain', emoji: '🧠' },
+    { key: 'heart', emoji: '❤️', activeEmoji: '❤️' },
+    { key: 'message', emoji: '💬', activeEmoji: '💬' },
+    { key: 'fire', emoji: '🔥', activeEmoji: '🔥' },
+    { key: 'brain', emoji: '🧠', activeEmoji: '🧠' },
   ] as const;
 
-  const bgCard = darkMode ? '#1A1A1A' : '#FFFFFF';
-  const borderColor = darkMode ? '#2D2D2D' : '#F3F4F6';
+  const bgCard = darkMode ? '#161616' : '#FFFFFF';
+  const borderColor = darkMode ? '#252525' : '#F0F0F0';
 
   return (
-    <View style={[styles.card, { backgroundColor: bgCard, borderColor }]}>
+    <View style={[styles.card, { backgroundColor: bgCard, borderColor, shadowColor: darkMode ? '#000' : '#8B5CF6' }]}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.authorInfo}>
-          <View style={[styles.avatar, { backgroundColor: darkMode ? '#2D2D2D' : '#F3F4F6' }]}>
+          <View style={[styles.avatar, { backgroundColor: darkMode ? '#252525' : '#F5F3FF' }]}>
             <Text style={styles.avatarEmoji}>👤</Text>
           </View>
-          <View>
+          <View style={styles.authorMeta}>
             <Text style={[styles.authorName, { color: colors.text }]}>Anónimo</Text>
             <Text style={[styles.timeAgo, { color: colors.textMuted }]}>{timeAgo(createdAt)}</Text>
           </View>
         </View>
         <View style={[
           styles.expiryBadge, 
-          { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.15)' : emotionStyle.bgColor }
+          { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.12)' : emotionStyle.bgColor }
         ]}>
-          <MaterialCommunityIcons name="clock-outline" size={14} color={emotionStyle.color} />
+          <MaterialCommunityIcons name="clock-outline" size={12} color={emotionStyle.color} />
           <Text style={[styles.expiryText, { color: emotionStyle.color }]}>
             {timeUntilExpiry(createdAt, expiresInHours)}
           </Text>
@@ -127,7 +132,7 @@ export default function ThoughtCard({
       {/* Emotion Tag */}
       <View style={[
         styles.emotionTag, 
-        { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.15)' : emotionStyle.bgColor }
+        { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.12)' : emotionStyle.bgColor }
       ]}>
         <Text style={styles.emotionTagEmoji}>{emotionEmoji}</Text>
         <Text style={[styles.emotionTagText, { color: emotionStyle.color }]}>{emotionLabel}</Text>
@@ -143,14 +148,18 @@ export default function ThoughtCard({
             <TouchableOpacity
               style={[
                 styles.reactionButton,
-                { backgroundColor: darkMode ? '#2D2D2D' : '#F9FAFB' },
-                reacted[key] && { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.2)' : '#EDE9FE' },
+                { backgroundColor: darkMode ? '#1F1F1F' : '#FAFAFA' },
+                reacted[key] && { 
+                  backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.2)' : '#EDE9FE',
+                  borderColor: colors.primary,
+                  borderWidth: 1.5,
+                },
               ]}
               onPress={() => key === 'message' ? setShowComments(true) : handleReact(key)}
               activeOpacity={0.7}
             >
               <Text style={styles.reactionEmoji}>{emoji}</Text>
-              <Text style={[styles.reactionCount, { color: colors.textSecondary }]}>
+              <Text style={[styles.reactionCount, { color: reacted[key] ? colors.primary : colors.textSecondary }]}>
                 {key === 'message' ? comments.length : localReactions[key]}
               </Text>
             </TouchableOpacity>
@@ -163,12 +172,14 @@ export default function ThoughtCard({
         <View style={[
           styles.aiResponse, 
           { 
-            backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.1)' : '#F5F3FF',
-            borderColor: darkMode ? 'rgba(139, 92, 246, 0.2)' : '#DDD6FE'
+            backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.08)' : '#F5F3FF',
+            borderLeftColor: colors.primary
           }
         ]}>
           <View style={styles.aiHeader}>
-            <MaterialCommunityIcons name="robot-outline" size={18} color={colors.primary} />
+            <View style={[styles.aiIconContainer, { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.2)' : '#EDE9FE' }]}>
+              <MaterialCommunityIcons name="robot-happy" size={16} color={colors.primary} />
+            </View>
             <Text style={[styles.aiLabel, { color: colors.primary }]}>Mentali</Text>
           </View>
           <Text style={[styles.aiText, { color: colors.text }]}>{aiResponse}</Text>
@@ -182,10 +193,11 @@ export default function ThoughtCard({
             behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
             style={[styles.modalContent, { backgroundColor: bgCard }]}
           >
+            <View style={styles.modalHandle} />
             <View style={styles.modalHeader}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>Comentarios</Text>
-              <TouchableOpacity onPress={() => setShowComments(false)}>
-                <MaterialCommunityIcons name="close" size={24} color={colors.textMuted} />
+              <TouchableOpacity onPress={() => setShowComments(false)} style={styles.closeButton}>
+                <MaterialCommunityIcons name="close" size={22} color={colors.textMuted} />
               </TouchableOpacity>
             </View>
             
@@ -193,14 +205,18 @@ export default function ThoughtCard({
               data={comments}
               keyExtractor={item => item.id.toString()}
               style={{ flex: 1 }}
+              contentContainerStyle={{ paddingVertical: 8 }}
               ListEmptyComponent={
-                <Text style={[styles.emptyText, { color: colors.textMuted }]}>
-                  Sé el primero en comentar 💬
-                </Text>
+                <View style={styles.emptyComments}>
+                  <MaterialCommunityIcons name="comment-outline" size={48} color={colors.textMuted} />
+                  <Text style={[styles.emptyText, { color: colors.textMuted }]}>
+                    Sé el primero en comentar
+                  </Text>
+                </View>
               }
               renderItem={({ item }) => (
                 <View style={[styles.commentItem, { borderBottomColor: borderColor }]}>
-                  <View style={[styles.commentAvatar, { backgroundColor: darkMode ? '#2D2D2D' : '#F3F4F6' }]}>
+                  <View style={[styles.commentAvatar, { backgroundColor: darkMode ? '#252525' : '#F5F3FF' }]}>
                     <Text>👤</Text>
                   </View>
                   <View style={{ flex: 1 }}>
@@ -219,7 +235,7 @@ export default function ThoughtCard({
                 style={[
                   styles.commentInput, 
                   { 
-                    backgroundColor: darkMode ? '#2D2D2D' : '#F9FAFB', 
+                    backgroundColor: darkMode ? '#1F1F1F' : '#F5F5F5', 
                     color: colors.text 
                   }
                 ]}
@@ -241,7 +257,7 @@ export default function ThoughtCard({
                   }
                 }}
               >
-                <MaterialCommunityIcons name="send" size={20} color="#FFFFFF" />
+                <MaterialCommunityIcons name="send" size={18} color="#FFFFFF" />
               </TouchableOpacity>
             </View>
           </KeyboardAvoidingView>
@@ -257,48 +273,49 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 18,
     marginHorizontal: 16,
-    marginBottom: 14,
-    shadowColor: '#8B5CF6',
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
+    marginBottom: 12,
+    shadowOpacity: 0.04,
+    shadowRadius: 16,
     shadowOffset: { width: 0, height: 4 },
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   authorInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
+    width: 44,
+    height: 44,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarEmoji: {
-    fontSize: 18,
+    fontSize: 20,
+  },
+  authorMeta: {
+    gap: 2,
   },
   authorName: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   timeAgo: {
     fontSize: 12,
-    marginTop: 2,
   },
   expiryBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 12,
-    gap: 4,
+    gap: 5,
   },
   expiryText: {
     fontSize: 12,
@@ -308,33 +325,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
     borderRadius: 16,
-    gap: 6,
-    marginBottom: 12,
+    gap: 7,
+    marginBottom: 14,
   },
   emotionTagEmoji: {
-    fontSize: 14,
+    fontSize: 15,
   },
   emotionTagText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
   content: {
     fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 14,
+    lineHeight: 23,
+    marginBottom: 16,
   },
   reactionsContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
   },
   reactionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 20,
     gap: 6,
   },
@@ -343,40 +360,55 @@ const styles = StyleSheet.create({
   },
   reactionCount: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   aiResponse: {
-    marginTop: 14,
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderLeftWidth: 3,
   },
   aiHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    gap: 10,
+    marginBottom: 10,
+  },
+  aiIconContainer: {
+    width: 28,
+    height: 28,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   aiLabel: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
   },
   aiText: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 21,
   },
   // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     padding: 20,
     maxHeight: '80%',
-    minHeight: 350,
+    minHeight: 400,
+  },
+  modalHandle: {
+    width: 36,
+    height: 4,
+    backgroundColor: '#D1D5DB',
+    borderRadius: 2,
+    alignSelf: 'center',
+    marginBottom: 16,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -385,59 +417,71 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyComments: {
+    alignItems: 'center',
+    paddingVertical: 40,
+    gap: 12,
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: 40,
-    fontSize: 14,
+    fontSize: 15,
   },
   commentItem: {
     flexDirection: 'row',
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     gap: 12,
   },
   commentAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   commentAuthor: {
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 2,
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 3,
   },
   commentText: {
-    fontSize: 14,
-    lineHeight: 20,
-    marginBottom: 4,
+    fontSize: 15,
+    lineHeight: 21,
+    marginBottom: 5,
   },
   commentTime: {
-    fontSize: 11,
+    fontSize: 12,
   },
   commentInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     paddingTop: 16,
     borderTopWidth: 1,
     marginTop: 12,
   },
   commentInput: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-    fontSize: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderRadius: 20,
+    fontSize: 15,
   },
   sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },

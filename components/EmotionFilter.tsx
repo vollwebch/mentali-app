@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, LayoutChangeEvent } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { useTheme } from '../ThemeContext';
 import { Colors } from '../constants/Colors';
 
 const EMOTIONS = [
-  { key: 'all', emoji: '🌊', label: 'Todos' },
+  { key: 'all', emoji: '✨', label: 'Todos' },
   { key: 'joy', emoji: '😊', label: 'Alegría' },
   { key: 'sadness', emoji: '😢', label: 'Tristeza' },
   { key: 'fear', emoji: '😰', label: 'Miedo' },
@@ -42,6 +42,7 @@ export default function EmotionFilter({ selected = 'all', onSelect }: EmotionFil
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         decelerationRate="fast"
+        bounces
       >
         {EMOTIONS.map((emotion) => {
           const isActive = selected === emotion.key;
@@ -54,10 +55,11 @@ export default function EmotionFilter({ selected = 'all', onSelect }: EmotionFil
                 {
                   backgroundColor: isActive 
                     ? (darkMode ? 'rgba(167, 139, 250, 0.15)' : '#F5F3FF')
-                    : (darkMode ? '#1A1A1A' : '#F9FAFB'),
+                    : (darkMode ? '#161616' : '#FAFAFA'),
                   borderColor: isActive 
                     ? colors.primary 
-                    : (darkMode ? '#2D2D2D' : '#E5E7EB'),
+                    : (darkMode ? '#252525' : '#ECECEC'),
+                  shadowOpacity: isActive ? 0.08 : 0,
                 }
               ]}
               onPress={() => onSelect?.(emotion.key)}
@@ -70,7 +72,7 @@ export default function EmotionFilter({ selected = 'all', onSelect }: EmotionFil
                   color: isActive 
                     ? colors.primary 
                     : (darkMode ? '#9CA3AF' : '#6B7280'),
-                  fontWeight: isActive ? '600' : '500'
+                  fontWeight: isActive ? '700' : '500'
                 }
               ]}>
                 {emotion.label}
@@ -85,7 +87,9 @@ export default function EmotionFilter({ selected = 'all', onSelect }: EmotionFil
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 10,
+    paddingVertical: 12,
+    borderBottomWidth: Platform.OS === 'web' ? 0 : 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
   },
   scrollContent: {
     flexDirection: 'row',
@@ -95,14 +99,17 @@ const styles = StyleSheet.create({
   chip: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 20,
+    borderRadius: 18,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderWidth: 1.5,
-    minWidth: 70,
+    minWidth: 75,
+    shadowColor: '#8B5CF6',
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
   },
   emoji: {
-    fontSize: 22,
+    fontSize: 20,
     marginBottom: 4,
   },
   label: {
