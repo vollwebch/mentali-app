@@ -1,98 +1,115 @@
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet, Dimensions, View } from 'react-native';
-import { IconSymbol } from '../../components/ui/IconSymbol';
+import { Platform, StyleSheet, Dimensions, View, Text, TouchableOpacity } from 'react-native';
 import { Colors } from '../../constants/Colors';
 import { useTheme } from '../../ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
-const MAX_WIDTH = 480;
+const CONTENT_MAX_WIDTH = 600;
 
 export default function TabLayout() {
   const { theme } = useTheme();
   const colors = Colors[theme];
   const darkMode = theme === 'dark';
   const screenWidth = Dimensions.get('window').width;
-  const isLargeScreen = screenWidth > 900;
+  const isLargeScreen = screenWidth > 1200;
 
   if (isLargeScreen) {
     // Return empty layout for large screens - sidebar handles navigation
-    return <Tabs screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }} />;
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <Tabs screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
+      </View>
+    );
   }
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', backgroundColor: colors.background }}>
-      <View style={{ flex: 1, width: '100%', maxWidth: MAX_WIDTH }}>
-        <Tabs
-          screenOptions={{
-            tabBarActiveTintColor: colors.primary,
-            headerShown: false,
-            tabBarStyle: {
-              backgroundColor: darkMode ? '#0A0A0A' : '#FFFFFF',
-              borderTopWidth: 1,
-              borderTopColor: darkMode ? '#1F1F1F' : '#F0F0F0',
-              height: 72,
-              paddingBottom: Platform.OS === 'ios' ? 24 : 14,
-              paddingTop: 12,
-              paddingHorizontal: 16,
-              shadowColor: '#000',
-              shadowOpacity: darkMode ? 0.3 : 0.05,
-              shadowRadius: 20,
-              shadowOffset: { width: 0, height: -6 },
-              elevation: 12,
-            },
-            tabBarLabelStyle: {
-              fontSize: 11,
-              fontWeight: '700',
-              marginTop: 6,
-              letterSpacing: 0.3,
-            },
-            tabBarInactiveTintColor: darkMode ? '#6B7280' : '#9CA3AF',
-            tabBarItemStyle: {
-              paddingVertical: 4,
-              gap: 2,
-            },
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: colors.primary,
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: darkMode ? '#0A0A0A' : '#FFFFFF',
+            borderTopWidth: 0,
+            height: 72,
+            paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+            paddingTop: 10,
+            paddingHorizontal: 8,
+            shadowColor: '#000',
+            shadowOpacity: darkMode ? 0.4 : 0.08,
+            shadowRadius: 24,
+            shadowOffset: { width: 0, height: -8 },
+            elevation: 20,
+          },
+          tabBarLabelStyle: {
+            fontSize: 10,
+            fontWeight: '700',
+            marginTop: 4,
+            letterSpacing: 0.2,
+          },
+          tabBarInactiveTintColor: darkMode ? '#4B5563' : '#9CA3AF',
+          tabBarItemStyle: {
+            paddingVertical: 2,
+            gap: 2,
+          },
+        }}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Inicio',
+            tabBarIcon: ({ color, focused }) => (
+              <View style={[styles.tabIconContainer, focused && styles.tabIconActive]}>
+                <MaterialCommunityIcons name={focused ? "home" : "home-outline"} size={24} color={color} />
+              </View>
+            ),
           }}
-        >
-          <Tabs.Screen
-            name="index"
-            options={{
-              title: 'Inicio',
-              tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="home" size={24} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="premios"
-            options={{
-              title: 'Premios',
-              tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="trophy" size={24} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="psicologo"
-            options={{
-              title: 'Psicólogo',
-              tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="brain" size={24} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="profile"
-            options={{
-              title: 'Perfil',
-              tabBarIcon: ({ color, size }) => (
-                <MaterialCommunityIcons name="account-circle" size={24} color={color} />
-              ),
-            }}
-          />
-        </Tabs>
-      </View>
+        />
+        <Tabs.Screen
+          name="premios"
+          options={{
+            title: 'Premios',
+            tabBarIcon: ({ color, focused }) => (
+              <View style={[styles.tabIconContainer, focused && styles.tabIconActive]}>
+                <MaterialCommunityIcons name={focused ? "trophy" : "trophy-outline"} size={24} color={color} />
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="psicologo"
+          options={{
+            title: 'Psicólogo',
+            tabBarIcon: ({ color, focused }) => (
+              <View style={[styles.tabIconContainer, focused && styles.tabIconActive]}>
+                <MaterialCommunityIcons name={focused ? "brain" : "brain"} size={24} color={color} />
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'Perfil',
+            tabBarIcon: ({ color, focused }) => (
+              <View style={[styles.tabIconContainer, focused && styles.tabIconActive]}>
+                <MaterialCommunityIcons name={focused ? "account" : "account-outline"} size={24} color={color} />
+              </View>
+            ),
+          }}
+        />
+      </Tabs>
     </View>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  tabIconContainer: {
+    padding: 4,
+    borderRadius: 12,
+  },
+  tabIconActive: {
+    // Active state handled by color
+  },
+});

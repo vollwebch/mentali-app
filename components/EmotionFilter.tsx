@@ -54,12 +54,13 @@ export default function EmotionFilter({ selected = 'all', onSelect }: EmotionFil
                 styles.chip,
                 {
                   backgroundColor: isActive 
-                    ? (darkMode ? 'rgba(167, 139, 250, 0.15)' : '#F5F3FF')
+                    ? (darkMode ? 'rgba(139, 92, 246, 0.15)' : '#EDE9FE')
                     : (darkMode ? '#161616' : '#FAFAFA'),
                   borderColor: isActive 
                     ? colors.primary 
-                    : (darkMode ? '#252525' : '#ECECEC'),
-                  shadowOpacity: isActive ? 0.08 : 0,
+                    : (darkMode ? '#252525' : '#EBEBEB'),
+                  shadowOpacity: isActive ? 0.06 : 0,
+                  shadowColor: colors.primary,
                 }
               ]}
               onPress={() => onSelect?.(emotion.key)}
@@ -93,27 +94,26 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    gap: 10,
+    paddingHorizontal: 12,
+    gap: 8,
   },
   chip: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 18,
-    paddingHorizontal: 16,
+    borderRadius: 16,
+    paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1.5,
-    minWidth: 75,
-    shadowColor: '#8B5CF6',
+    minWidth: 70,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
   },
   emoji: {
-    fontSize: 20,
-    marginBottom: 4,
+    fontSize: 18,
+    marginBottom: 3,
   },
   label: {
-    fontSize: 12,
+    fontSize: 11,
     textAlign: 'center',
   },
 });

@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import React, { useState } from 'react';
 import { Animated, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, KeyboardAvoidingView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../ThemeContext';
 import { Colors } from '../constants/Colors';
 
@@ -90,23 +91,23 @@ export default function ThoughtCard({
     }));
     setReacted(prev => ({ ...prev, [type]: !prev[type] }));
     Animated.sequence([
-      Animated.timing(scales[type], { toValue: 1.35, duration: 100, useNativeDriver: true }),
+      Animated.timing(scales[type], { toValue: 1.4, duration: 100, useNativeDriver: true }),
       Animated.timing(scales[type], { toValue: 1, duration: 150, useNativeDriver: true }),
     ]).start();
   };
 
   const REACTIONS = [
-    { key: 'heart', emoji: '❤️', activeEmoji: '❤️' },
-    { key: 'message', emoji: '💬', activeEmoji: '💬' },
-    { key: 'fire', emoji: '🔥', activeEmoji: '🔥' },
-    { key: 'brain', emoji: '🧠', activeEmoji: '🧠' },
+    { key: 'heart', emoji: '❤️', activeEmoji: '❤️', label: 'Me gusta' },
+    { key: 'message', emoji: '💬', activeEmoji: '💬', label: 'Comentar' },
+    { key: 'fire', emoji: '🔥', activeEmoji: '🔥', label: 'Apoyar' },
+    { key: 'brain', emoji: '🧠', activeEmoji: '🧠', label: 'Entiendo' },
   ] as const;
 
   const bgCard = darkMode ? '#161616' : '#FFFFFF';
   const borderColor = darkMode ? '#252525' : '#F0F0F0';
 
   return (
-    <View style={[styles.card, { backgroundColor: bgCard, borderColor, shadowColor: darkMode ? '#000' : '#8B5CF6' }]}>
+    <View style={[styles.card, { backgroundColor: bgCard, borderColor }]}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.authorInfo}>
@@ -115,34 +116,39 @@ export default function ThoughtCard({
           </View>
           <View style={styles.authorMeta}>
             <Text style={[styles.authorName, { color: colors.text }]}>Anónimo</Text>
-            <Text style={[styles.timeAgo, { color: colors.textMuted }]}>{timeAgo(createdAt)}</Text>
+            <View style={styles.metaRow}>
+              <Text style={[styles.timeAgo, { color: colors.textMuted }]}>{timeAgo(createdAt)}</Text>
+              <Text style={[styles.dot, { color: colors.textMuted }]}>·</Text>
+              <View style={[styles.expiryBadge, { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.12)' : emotionStyle.bgColor }]}>
+                <MaterialCommunityIcons name="clock-outline" size={10} color={emotionStyle.color} />
+                <Text style={[styles.expiryText, { color: emotionStyle.color }]}>
+                  {timeUntilExpiry(createdAt, expiresInHours)}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
-        <View style={[
-          styles.expiryBadge, 
-          { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.12)' : emotionStyle.bgColor }
-        ]}>
-          <MaterialCommunityIcons name="clock-outline" size={12} color={emotionStyle.color} />
-          <Text style={[styles.expiryText, { color: emotionStyle.color }]}>
-            {timeUntilExpiry(createdAt, expiresInHours)}
-          </Text>
-        </View>
-      </View>
-
-      {/* Emotion Tag */}
-      <View style={[
-        styles.emotionTag, 
-        { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.12)' : emotionStyle.bgColor }
-      ]}>
-        <Text style={styles.emotionTagEmoji}>{emotionEmoji}</Text>
-        <Text style={[styles.emotionTagText, { color: emotionStyle.color }]}>{emotionLabel}</Text>
+        <TouchableOpacity style={styles.moreBtn}>
+          <MaterialCommunityIcons name="dots-horizontal" size={20} color={colors.textMuted} />
+        </TouchableOpacity>
       </View>
 
       {/* Content */}
       <Text style={[styles.content, { color: colors.text }]}>{text}</Text>
 
+      {/* Emotion Tag */}
+      <View style={styles.emotionRow}>
+        <View style={[
+          styles.emotionTag, 
+          { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.12)' : emotionStyle.bgColor }
+        ]}>
+          <Text style={styles.emotionTagEmoji}>{emotionEmoji}</Text>
+          <Text style={[styles.emotionTagText, { color: emotionStyle.color }]}>{emotionLabel}</Text>
+        </View>
+      </View>
+
       {/* Reactions */}
-      <View style={styles.reactionsContainer}>
+      <View style={[styles.reactionsContainer, { borderTopColor: borderColor }]}>
         {REACTIONS.map(({ key, emoji }) => (
           <Animated.View key={key} style={{ transform: [{ scale: scales[key] }] }}>
             <TouchableOpacity
@@ -151,8 +157,6 @@ export default function ThoughtCard({
                 { backgroundColor: darkMode ? '#1F1F1F' : '#FAFAFA' },
                 reacted[key] && { 
                   backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.2)' : '#EDE9FE',
-                  borderColor: colors.primary,
-                  borderWidth: 1.5,
                 },
               ]}
               onPress={() => key === 'message' ? setShowComments(true) : handleReact(key)}
@@ -169,18 +173,18 @@ export default function ThoughtCard({
 
       {/* AI Response */}
       {aiResponse && (
-        <View style={[
-          styles.aiResponse, 
-          { 
-            backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.08)' : '#F5F3FF',
-            borderLeftColor: colors.primary
-          }
-        ]}>
+        <View style={[styles.aiResponse, { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.08)' : '#F5F3FF' }]}>
           <View style={styles.aiHeader}>
-            <View style={[styles.aiIconContainer, { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.2)' : '#EDE9FE' }]}>
-              <MaterialCommunityIcons name="robot-happy" size={16} color={colors.primary} />
-            </View>
+            <LinearGradient
+              colors={['#8B5CF6', '#A855F7']}
+              style={styles.aiIconContainer}
+            >
+              <MaterialCommunityIcons name="robot-happy" size={16} color="#FFFFFF" />
+            </LinearGradient>
             <Text style={[styles.aiLabel, { color: colors.primary }]}>Mentali</Text>
+            <View style={[styles.aiBadge, { backgroundColor: darkMode ? 'rgba(16, 185, 129, 0.15)' : '#D1FAE5' }]}>
+              <Text style={[styles.aiBadgeText, { color: '#10B981' }]}>IA</Text>
+            </View>
           </View>
           <Text style={[styles.aiText, { color: colors.text }]}>{aiResponse}</Text>
         </View>
@@ -208,7 +212,9 @@ export default function ThoughtCard({
               contentContainerStyle={{ paddingVertical: 8 }}
               ListEmptyComponent={
                 <View style={styles.emptyComments}>
-                  <MaterialCommunityIcons name="comment-outline" size={48} color={colors.textMuted} />
+                  <View style={[styles.emptyCommentsIcon, { backgroundColor: darkMode ? '#252525' : '#F5F3FF' }]}>
+                    <MaterialCommunityIcons name="comment-outline" size={32} color={colors.primary} />
+                  </View>
                   <Text style={[styles.emptyText, { color: colors.textMuted }]}>
                     Sé el primero en comentar
                   </Text>
@@ -271,18 +277,19 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
     borderWidth: 1,
-    padding: 18,
+    padding: 16,
     marginHorizontal: 16,
     marginBottom: 12,
-    shadowOpacity: 0.04,
-    shadowRadius: 16,
+    shadowColor: '#8B5CF6',
+    shadowOpacity: 0.03,
+    shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 14,
+    alignItems: 'flex-start',
+    marginBottom: 12,
   },
   authorInfo: {
     flexDirection: 'row',
@@ -306,83 +313,113 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   timeAgo: {
+    fontSize: 12,
+  },
+  dot: {
     fontSize: 12,
   },
   expiryBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    gap: 4,
   },
   expiryText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
+  },
+  moreBtn: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+  },
+  content: {
+    fontSize: 15,
+    lineHeight: 23,
+    marginBottom: 12,
+  },
+  emotionRow: {
+    marginBottom: 12,
   },
   emotionTag: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 16,
-    gap: 7,
-    marginBottom: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
+    gap: 6,
   },
   emotionTagEmoji: {
-    fontSize: 15,
+    fontSize: 14,
   },
   emotionTagText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
-  },
-  content: {
-    fontSize: 15,
-    lineHeight: 23,
-    marginBottom: 16,
   },
   reactionsContainer: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
   },
   reactionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 20,
-    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    gap: 5,
   },
   reactionEmoji: {
-    fontSize: 16,
+    fontSize: 15,
   },
   reactionCount: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
   },
   aiResponse: {
-    marginTop: 16,
-    padding: 16,
+    marginTop: 12,
+    padding: 14,
     borderRadius: 16,
     borderLeftWidth: 3,
+    borderLeftColor: '#8B5CF6',
   },
   aiHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 10,
+    gap: 8,
+    marginBottom: 8,
   },
   aiIconContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 10,
+    width: 26,
+    height: 26,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   aiLabel: {
     fontSize: 13,
+    fontWeight: '700',
+  },
+  aiBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    marginLeft: 'auto',
+  },
+  aiBadgeText: {
+    fontSize: 10,
     fontWeight: '700',
   },
   aiText: {
@@ -392,7 +429,7 @@ const styles = StyleSheet.create({
   // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -433,55 +470,62 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     gap: 12,
   },
+  emptyCommentsIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   emptyText: {
     textAlign: 'center',
     fontSize: 15,
   },
   commentItem: {
     flexDirection: 'row',
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     gap: 12,
   },
   commentAvatar: {
-    width: 38,
-    height: 38,
-    borderRadius: 14,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   commentAuthor: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
-    marginBottom: 3,
+    marginBottom: 2,
   },
   commentText: {
-    fontSize: 15,
-    lineHeight: 21,
-    marginBottom: 5,
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 4,
   },
   commentTime: {
-    fontSize: 12,
+    fontSize: 11,
   },
   commentInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingTop: 16,
+    gap: 10,
+    paddingTop: 14,
     borderTopWidth: 1,
     marginTop: 12,
   },
   commentInput: {
     flex: 1,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 18,
     fontSize: 15,
   },
   sendButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
