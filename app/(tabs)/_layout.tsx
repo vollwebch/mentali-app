@@ -8,10 +8,23 @@ export default function TabLayout() {
   const { theme } = useTheme();
   const colors = Colors[theme];
   const darkMode = theme === 'dark';
+  const screenWidth = Dimensions.get('window').width;
+  const isLargeScreen = screenWidth > 768;
+
+  // Hide tab bar on large screens
+  if (isLargeScreen) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center' }}>
+        <View style={{ flex: 1, width: '100%', maxWidth: 720 }}>
+          <Tabs screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background, alignItems: 'center' }}>
-      <View style={{ flex: 1, width: '100%', maxWidth: 520 }}>
+      <View style={{ flex: 1, width: '100%', maxWidth: 720 }}>
         <Tabs
           screenOptions={{
             tabBarActiveTintColor: colors.primary,

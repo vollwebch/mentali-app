@@ -1,11 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { GiftedChat, IMessage, Bubble, InputToolbar, Send } from 'react-native-gifted-chat';
-import { Platform, View, StyleSheet, Text, SafeAreaView, StatusBar, KeyboardAvoidingView, TouchableOpacity } from 'react-native';
+import { Platform, View, StyleSheet, Text, SafeAreaView, StatusBar, KeyboardAvoidingView, TouchableOpacity, Dimensions } from 'react-native';
 import { useTheme } from '../../ThemeContext';
 import { Colors } from '../../constants/Colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
 
 const API_URL = '/api/chat';
 
@@ -13,7 +12,8 @@ export default function PsicologoChat() {
   const { theme } = useTheme();
   const colors = Colors[theme];
   const darkMode = theme === 'dark';
-  const router = useRouter();
+  const screenWidth = Dimensions.get('window').width;
+  const isLargeScreen = screenWidth > 768;
 
   const [messages, setMessages] = useState<IMessage[]>([
     {
@@ -164,7 +164,10 @@ export default function PsicologoChat() {
           renderBubble={renderBubble}
           renderInputToolbar={renderInputToolbar}
           renderSend={renderSend}
-          messagesContainerStyle={{ backgroundColor: darkMode ? '#0A0A0A' : '#FFFFFF' }}
+          messagesContainerStyle={{ 
+            backgroundColor: darkMode ? '#0A0A0A' : '#FFFFFF',
+            paddingBottom: isLargeScreen ? 20 : 60
+          }}
           listViewProps={{
             style: { backgroundColor: darkMode ? '#0A0A0A' : '#FFFFFF' },
             contentContainerStyle: { paddingHorizontal: 8 },
@@ -210,7 +213,7 @@ export default function PsicologoChat() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  contentContainer: { flex: 1, maxWidth: 520, width: '100%', alignSelf: 'center' },
+  contentContainer: { flex: 1, maxWidth: 720, width: '100%', alignSelf: 'center' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1 },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatarContainer: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
@@ -222,7 +225,7 @@ const styles = StyleSheet.create({
   badge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, gap: 4 },
   badgeText: { fontSize: 11, fontWeight: '700' },
   sendButton: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  quickReplies: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 10, paddingVertical: 8, borderTopWidth: 1 },
+  quickReplies: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 10, paddingVertical: 8, borderTopWidth: 1, marginBottom: 60 },
   quickReplyBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, borderWidth: 1, gap: 5 },
   quickReplyEmoji: { fontSize: 13 },
   quickReplyText: { fontSize: 11, fontWeight: '500' },

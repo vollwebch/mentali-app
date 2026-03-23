@@ -27,6 +27,11 @@ export default function ProfileScreen() {
     }
   }, [levelUpInfo]);
 
+  const handleClosePrizeModal = () => {
+    setShowPrize(false);
+    clearLevelUp();
+  };
+
   const currentLevel = userStats.level;
   const levelData = TREE_LEVELS.find(l => l.level === currentLevel) || TREE_LEVELS[0];
   const nextLevelData = TREE_LEVELS.find(l => l.level === currentLevel + 1);
@@ -43,6 +48,15 @@ export default function ProfileScreen() {
     return count > 0 ? total / count : 0;
   }, [userStats, nextLevelData]);
 
+  const missing = useMemo(() => {
+    if (!nextLevelData) return null;
+    return {
+      thoughts: Math.max(0, nextLevelData.requiredThoughts - userStats.thoughts),
+      likes: Math.max(0, nextLevelData.requiredLikes - userStats.likes),
+      days: Math.max(0, nextLevelData.requiredDays - userStats.days),
+    };
+  }, [userStats, nextLevelData]);
+
   const predominantEmotion = useMemo(() => {
     if (allThoughts.length === 0) return 'Ninguna';
     const counts = allThoughts.reduce((acc, t) => {
@@ -53,10 +67,10 @@ export default function ProfileScreen() {
   }, [allThoughts]);
 
   const stats = [
-    { icon: 'pencil', label: 'Pensamientos', value: userStats.thoughtsWritten, color: '#8B5CF6' },
-    { icon: 'fire', label: 'Racha', value: `${userStats.streak} días`, color: '#F59E0B' },
-    { icon: 'heart', label: 'Likes', value: userStats.likesReceived, color: '#EC4899' },
-    { icon: 'star', label: 'XP', value: userStats.xp, color: '#10B981' },
+    { icon: 'pencil', label: 'Pensamientos', value: userStats.thoughts, color: '#8B5CF6' },
+    { icon: 'fire', label: 'Racha', value: `${userStats.days} días`, color: '#F59E0B' },
+    { icon: 'heart', label: 'Likes', value: userStats.likes, color: '#EC4899' },
+    { icon: 'star', label: 'Nivel', value: userStats.level, color: '#10B981' },
   ];
 
   return (
@@ -64,7 +78,7 @@ export default function ProfileScreen() {
       <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} backgroundColor={darkMode ? '#0A0A0A' : '#FFFFFF'} />
       
       <View style={styles.contentContainer}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {/* Header */}
           <View style={styles.headerRow}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>Tu Espacio</Text>
@@ -116,7 +130,7 @@ export default function ProfileScreen() {
             
             <View style={styles.progressSection}>
               <View style={styles.progressHeader}>
-                <Text style={[styles.progressLabel, { color: darkMode ? 'rgba(255,255,255,0.7)' : '#065F46' }]}>Progreso</Text>
+                <Text style={[styles.progressLabel, { color: darkMode ? 'rgba(255,255,255,0.7)' : '#065F46' }]}>Progreso al siguiente nivel</Text>
                 <Text style={styles.progressPercent}>{Math.round(progress * 100)}%</Text>
               </View>
               <View style={[styles.progressBarBg, { backgroundColor: darkMode ? 'rgba(255,255,255,0.15)' : '#A7F3D0' }]}>
@@ -124,7 +138,31 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            <TouchableOpacity onPress={() => router.push('/premios')} style={styles.viewPrizesBtn}>
+            {/* Requirements */}
+            {missing && (
+              <View style={styles.requirementsRow}>
+                {missing.thoughts > 0 && (
+                  <View style={[styles.requirementBadge, { backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : '#FFFFFF' }]}>
+                    <MaterialCommunityIcons name="pencil" size={14} color="#A78BFA" />
+                    <Text style={[styles.requirementText, { color: darkMode ? '#FFFFFF' : '#065F46' }]}>{missing.thoughts} pensamientos</Text>
+                  </View>
+                )}
+                {missing.likes > 0 && (
+                  <View style={[styles.requirementBadge, { backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : '#FFFFFF' }]}>
+                    <MaterialCommunityIcons name="heart" size={14} color="#F472B6" />
+                    <Text style={[styles.requirementText, { color: darkMode ? '#FFFFFF' : '#065F46' }]}>{missing.likes} likes</Text>
+                  </View>
+                )}
+                {missing.days > 0 && (
+                  <View style={[styles.requirementBadge, { backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : '#FFFFFF' }]}>
+                    <MaterialCommunityIcons name="calendar" size={14} color="#38BDF8" />
+                    <Text style={[styles.requirementText, { color: darkMode ? '#FFFFFF' : '#065F46' }]}>{missing.days} días</Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            <TouchableOpacity onPress={() => router.push('/(tabs)/premios')} style={styles.viewPrizesBtn}>
               <Text style={styles.viewPrizesText}>Ver todos los premios</Text>
               <Feather name="arrow-right" size={16} color="#10B981" />
             </TouchableOpacity>
@@ -155,9 +193,14 @@ export default function ProfileScreen() {
                 <Text style={[styles.emptyText, { color: colors.textMuted }]}>No hay pensamientos privados</Text>
               </View>
             ) : (
-              privateThoughts.slice(0, 2).map(t => (
+              privateThoughts.slice(0, 3).map(t => (
                 <View key={t.id} style={[styles.historyItem, { backgroundColor: darkMode ? '#1F1F1F' : '#FAFAFA' }]}>
-                  <Text style={[styles.historyDate, { color: colors.textMuted }]}>{new Date(t.createdAt).toLocaleDateString()}</Text>
+                  <View style={styles.historyHeader}>
+                    <Text style={[styles.historyDate, { color: colors.textMuted }]}>{new Date(t.createdAt).toLocaleDateString()}</Text>
+                    <View style={[styles.historyTag, { backgroundColor: darkMode ? 'rgba(139, 92, 246, 0.15)' : '#F5F3FF' }]}>
+                      <Text style={[styles.historyTagText, { color: colors.primary }]}>{t.emotionLabel}</Text>
+                    </View>
+                  </View>
                   <Text style={[styles.historyText, { color: colors.text }]} numberOfLines={2}>{t.text}</Text>
                 </View>
               ))
@@ -175,17 +218,17 @@ export default function ProfileScreen() {
       </View>
 
       {/* Level Up Modal */}
-      <Modal visible={showPrize} transparent animationType="fade" onRequestClose={() => { setShowPrize(false); clearLevelUp(); }}>
+      <Modal visible={showPrize} transparent animationType="fade" onRequestClose={handleClosePrizeModal}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: darkMode ? '#161616' : '#FFFFFF' }]}>
             {levelUpInfo && (
               <>
                 <View style={[styles.levelUpIconContainer, { backgroundColor: darkMode ? 'rgba(251, 191, 36, 0.15)' : '#FEF3C7' }]}>
-                  <MaterialCommunityIcons name={levelUpInfo.reward.icon as any} size={44} color="#FBBF24" />
+                  <MaterialCommunityIcons name="star" size={44} color="#FBBF24" />
                 </View>
                 <Text style={[styles.levelUpTitle, { color: colors.text }]}>¡Nivel {levelUpInfo.level}!</Text>
-                <Text style={[styles.levelUpDesc, { color: colors.textSecondary }]}>{levelUpInfo.reward.text}</Text>
-                <TouchableOpacity onPress={() => { setShowPrize(false); clearLevelUp(); }} style={styles.levelUpBtn}>
+                <Text style={[styles.levelUpDesc, { color: colors.textSecondary }]}>¡Felicidades! Has alcanzado un nuevo nivel.</Text>
+                <TouchableOpacity onPress={handleClosePrizeModal} style={styles.levelUpBtn}>
                   <Text style={styles.levelUpBtnText}>¡Genial!</Text>
                 </TouchableOpacity>
               </>
@@ -199,23 +242,24 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  contentContainer: { flex: 1, maxWidth: 520, width: '100%', alignSelf: 'center' },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 },
+  contentContainer: { flex: 1, maxWidth: 720, width: '100%', alignSelf: 'center' },
+  scrollContent: { paddingBottom: 120, paddingHorizontal: 16 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 16, paddingBottom: 12 },
   headerTitle: { fontSize: 24, fontWeight: '800' },
   settingsBtn: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  profileCard: { borderRadius: 18, borderWidth: 1, padding: 16, marginHorizontal: 16, marginBottom: 12 },
+  profileCard: { borderRadius: 18, borderWidth: 1, padding: 16, marginBottom: 12 },
   profileHeader: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   profileAvatar: { width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   profileInfo: { flex: 1 },
   profileName: { fontSize: 18, fontWeight: '800', marginBottom: 4 },
   levelBadge: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   levelText: { fontSize: 13, fontWeight: '700', color: '#FBBF24' },
-  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 10, gap: 8, marginBottom: 12 },
+  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
   statCard: { flex: 1, minWidth: '45%', borderRadius: 16, borderWidth: 1, padding: 14, alignItems: 'center' },
   statIconContainer: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   statValue: { fontSize: 20, fontWeight: '800', marginBottom: 2 },
   statLabel: { fontSize: 11 },
-  treeCard: { borderRadius: 20, padding: 18, marginHorizontal: 16, marginBottom: 12 },
+  treeCard: { borderRadius: 20, padding: 18, marginBottom: 12 },
   treeHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 14 },
   treeIconContainer: { width: 48, height: 48, borderRadius: 16, backgroundColor: 'rgba(16, 185, 129, 0.2)', alignItems: 'center', justifyContent: 'center' },
   treeTitleContainer: { flex: 1 },
@@ -227,9 +271,12 @@ const styles = StyleSheet.create({
   progressPercent: { fontSize: 14, fontWeight: '800', color: '#10B981' },
   progressBarBg: { height: 8, borderRadius: 4, overflow: 'hidden' },
   progressBarFill: { height: 8, backgroundColor: '#10B981', borderRadius: 4 },
+  requirementsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
+  requirementBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, gap: 6 },
+  requirementText: { fontSize: 12, fontWeight: '600' },
   viewPrizesBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 10 },
   viewPrizesText: { fontSize: 13, fontWeight: '700', color: '#10B981' },
-  sectionCard: { borderRadius: 18, borderWidth: 1, padding: 16, marginHorizontal: 16, marginBottom: 10 },
+  sectionCard: { borderRadius: 18, borderWidth: 1, padding: 16, marginBottom: 10 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12 },
   sectionTitle: { fontSize: 16, fontWeight: '700' },
   emotionBadge: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12, gap: 6 },
@@ -239,9 +286,12 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', paddingVertical: 20, gap: 6 },
   emptyText: { fontSize: 13, textAlign: 'center' },
   historyItem: { borderRadius: 12, padding: 12, marginBottom: 6 },
-  historyDate: { fontSize: 11, marginBottom: 4 },
+  historyHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  historyDate: { fontSize: 11 },
+  historyTag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  historyTagText: { fontSize: 11, fontWeight: '600' },
   historyText: { fontSize: 13, lineHeight: 18 },
-  actionBtn: { marginHorizontal: 16, marginTop: 8, borderRadius: 14, borderWidth: 1, overflow: 'hidden' },
+  actionBtn: { borderRadius: 14, borderWidth: 1, overflow: 'hidden', marginTop: 8 },
   actionBtnGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, gap: 8 },
   actionBtnText: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },

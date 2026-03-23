@@ -10,7 +10,7 @@ import ThoughtCard from '../../components/ThoughtCard';
 import { useThoughts } from '../../components/ThoughtsContext';
 import { Colors } from '../../constants/Colors';
 
-const MAX_WIDTH = 520;
+const MAX_WIDTH = 720;
 
 export default function HomeScreen() {
   const { theme } = useTheme();
@@ -20,6 +20,9 @@ export default function HomeScreen() {
   const [selectedEmotion, setSelectedEmotion] = useState('all');
   const [pulse] = useState(new Animated.Value(1));
   const router = useRouter();
+  
+  const screenWidth = Dimensions.get('window').width;
+  const isLargeScreen = screenWidth > 768;
 
   React.useEffect(() => {
     Animated.loop(
@@ -52,7 +55,11 @@ export default function HomeScreen() {
         <FlatList
           data={filteredPosts}
           keyExtractor={item => item.id}
-          contentContainerStyle={{ paddingTop: 8, paddingBottom: 100 }}
+          contentContainerStyle={{ 
+            paddingTop: 8, 
+            paddingBottom: isLargeScreen ? 40 : 120,
+            paddingHorizontal: isLargeScreen ? 24 : 0 
+          }}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>

@@ -21,8 +21,15 @@ export default function PremiosScreen() {
   const [showAllLocked, setShowAllLocked] = useState(false);
   const screenWidth = Dimensions.get('window').width;
   const slideAnim = useState(new Animated.Value(screenWidth))[0];
-  const opacityAnim = useState(new Animated.Value(0))[0];
   const { userStats } = useThoughts();
+  
+  // Use correct stats property names
+  const stats = {
+    thoughts: userStats.thoughts || 0,
+    likes: userStats.likes || 0,
+    days: userStats.days || 1,
+    level: userStats.level || 1,
+  };
 
   useEffect(() => {
     if (settingsVisible) {
@@ -32,17 +39,9 @@ export default function PremiosScreen() {
     }
   }, [settingsVisible]);
 
-  useEffect(() => {
-    if (showStats) {
-      Animated.timing(opacityAnim, { toValue: 1, duration: 300, useNativeDriver: true }).start();
-    } else {
-      Animated.timing(opacityAnim, { toValue: 0, duration: 300, useNativeDriver: true }).start();
-    }
-  }, [showStats]);
-
   const ALL_PRIZES = PRIZES.map(prize => ({
     ...prize,
-    unlocked: prize.isUnlocked ? prize.isUnlocked(userStats) : false,
+    unlocked: prize.isUnlocked ? prize.isUnlocked(stats) : false,
     color: prize.color || '#8B5CF6',
   }));
 
@@ -62,7 +61,7 @@ export default function PremiosScreen() {
   const renderPrize = (prize: any) => {
     const isIconName = typeof prize.icon === 'string' && prize.icon.length > 2;
     return (
-      <View key={prize.id} style={[styles.prizeCard, { backgroundColor: darkMode ? '#1F1F1F' : '#FAFAFA', borderColor: darkMode ? '#252525' : '#E5E5E5' }]}>
+      <View key={prize.id} style={styles.prizeCard}>
         <View style={[styles.prizeIconContainer, { backgroundColor: prize.color + '20' }]}>
           {isIconName ? (
             <MaterialCommunityIcons name={prize.icon as any} size={28} color={prize.color} />
@@ -80,7 +79,7 @@ export default function PremiosScreen() {
       <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} backgroundColor={darkMode ? '#0A0A0A' : '#FFFFFF'} />
       
       <View style={styles.contentContainer}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           {/* Header */}
           <View style={styles.headerRow}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>Premios</Text>
@@ -118,7 +117,7 @@ export default function PremiosScreen() {
               </View>
               <View style={styles.statDivider} />
               <View style={styles.statBox}>
-                <Text style={styles.statNumber}>{userStats.level}</Text>
+                <Text style={styles.statNumber}>{stats.level}</Text>
                 <Text style={styles.statLabel}>Nivel</Text>
               </View>
             </View>
@@ -160,7 +159,7 @@ export default function PremiosScreen() {
             </View>
             <View style={styles.prizesGrid}>
               {visibleLockedPrizes.map(prize => (
-                <View key={prize.id} style={[styles.prizeCardLocked, { backgroundColor: darkMode ? '#1A1A1A' : '#FAFAFA', borderColor: darkMode ? '#252525' : '#E5E5E5' }]}>
+                <View key={prize.id} style={styles.prizeCardLocked}>
                   <View style={styles.lockedIconContainer}>
                     <MaterialCommunityIcons name="lock" size={18} color={colors.textMuted} />
                   </View>
@@ -240,26 +239,22 @@ export default function PremiosScreen() {
               <Text style={[styles.statsSectionTitle, { color: colors.primary }]}>Actividad</Text>
               <View style={styles.statRow}>
                 <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Pensamientos</Text>
-                <Text style={[styles.statValue, { color: colors.text }]}>{userStats.thoughtsWritten}</Text>
+                <Text style={[styles.statValue, { color: colors.text }]}>{stats.thoughts}</Text>
               </View>
               <View style={styles.statRow}>
                 <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Racha</Text>
-                <Text style={[styles.statValue, { color: colors.text }]}>{userStats.streak} días</Text>
+                <Text style={[styles.statValue, { color: colors.text }]}>{stats.days} días</Text>
               </View>
               <View style={styles.statRow}>
                 <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Likes recibidos</Text>
-                <Text style={[styles.statValue, { color: colors.text }]}>{userStats.likesReceived}</Text>
+                <Text style={[styles.statValue, { color: colors.text }]}>{stats.likes}</Text>
               </View>
             </View>
             <View style={styles.statsSection}>
               <Text style={[styles.statsSectionTitle, { color: colors.primary }]}>Progreso</Text>
               <View style={styles.statRow}>
                 <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Nivel actual</Text>
-                <Text style={[styles.statValue, { color: colors.text }]}>{userStats.level}</Text>
-              </View>
-              <View style={styles.statRow}>
-                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>XP Actual</Text>
-                <Text style={[styles.statValue, { color: colors.text }]}>{userStats.xp}</Text>
+                <Text style={[styles.statValue, { color: colors.text }]}>{stats.level}</Text>
               </View>
             </View>
           </View>
@@ -271,12 +266,13 @@ export default function PremiosScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  contentContainer: { flex: 1, maxWidth: 520, width: '100%', alignSelf: 'center' },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 12 },
+  contentContainer: { flex: 1, maxWidth: 720, width: '100%', alignSelf: 'center' },
+  scrollContent: { paddingBottom: 120, paddingHorizontal: 16 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 16, paddingBottom: 12 },
   headerTitle: { fontSize: 24, fontWeight: '800' },
   headerButtons: { flexDirection: 'row', gap: 10 },
   headerBtn: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  statsBanner: { borderRadius: 20, padding: 20, marginHorizontal: 16, alignItems: 'center', marginBottom: 16 },
+  statsBanner: { borderRadius: 20, padding: 20, alignItems: 'center', marginBottom: 16 },
   statsBannerIcon: { width: 52, height: 52, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
   statsBannerTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '800', marginBottom: 4 },
   statsBannerDesc: { color: 'rgba(255,255,255,0.8)', fontSize: 14, marginBottom: 14 },
@@ -285,14 +281,14 @@ const styles = StyleSheet.create({
   statDivider: { width: 1, height: 32, backgroundColor: 'rgba(255,255,255,0.2)' },
   statNumber: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
   statLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11, marginTop: 4 },
-  sectionCard: { borderRadius: 20, borderWidth: 1, padding: 16, marginHorizontal: 16, marginBottom: 12 },
+  sectionCard: { borderRadius: 20, borderWidth: 1, padding: 16, marginBottom: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, gap: 10 },
   sectionTitle: { fontSize: 16, fontWeight: '700' },
   emptyState: { alignItems: 'center', paddingVertical: 24, gap: 8 },
   emptyText: { fontSize: 14 },
   prizesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  prizeCard: { width: '23%', aspectRatio: 1, borderRadius: 14, padding: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  prizeCardLocked: { width: '23%', aspectRatio: 1, borderRadius: 14, padding: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  prizeCard: { width: '23.5%', aspectRatio: 1, borderRadius: 14, padding: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(139,92,246,0.05)' },
+  prizeCardLocked: { width: '23.5%', aspectRatio: 1, borderRadius: 14, padding: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.05)' },
   prizeIconContainer: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
   prizeEmoji: { fontSize: 24 },
   prizeTitle: { fontSize: 9, fontWeight: '700', textAlign: 'center' },
