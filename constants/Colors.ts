@@ -18,6 +18,7 @@ export const Colors = {
     text: '#1F2937',
     textSecondary: '#6B7280',
     textMuted: '#9CA3AF',
+    textDark: '#111827',
     
     // Cards & Surfaces
     card: '#FFFFFF',
@@ -54,6 +55,7 @@ export const Colors = {
     text: '#F9FAFB',
     textSecondary: '#D1D5DB',
     textMuted: '#9CA3AF',
+    textDark: '#FFFFFF',
     
     // Cards & Surfaces
     card: '#1A1A1A',
@@ -76,19 +78,4 @@ export const Colors = {
     blurBg: 'rgba(0, 0, 0, 0.5)',
     fabGradient: ['#8B5CF6', '#EC4899'],
   },
-};
-
-// Emotion colors - modern palette
-export const EMOTION_COLORS: Record<string, { color: string; gradient: string[] }> = {
-  joy: { color: '#FBBF24', gradient: ['#FBBF24', '#F59E0B'] },
-  sadness: { color: '#60A5FA', gradient: ['#60A5FA', '#3B82F6'] },
-  fear: { color: '#A78BFA', gradient: ['#A78BFA', '#8B5CF6'] },
-  anger: { color: '#F87171', gradient: ['#F87171', '#EF4444'] },
-  love: { color: '#F472B6', gradient: ['#F472B6', '#EC4899'] },
-  anxiety: { color: '#FB923C', gradient: ['#FB923C', '#F97316'] },
-  hope: { color: '#34D399', gradient: ['#34D399', '#10B981'] },
-  calm: { color: '#818CF8', gradient: ['#818CF8', '#6366F1'] },
-  gratitude: { color: '#F472B6', gradient: ['#F472B6', '#EC4899'] },
-  surprise: { color: '#FBBF24', gradient: ['#FBBF24', '#F59E0B'] },
-  default: { color: '#A78BFA', gradient: ['#A78BFA', '#8B5CF6'] },
 };

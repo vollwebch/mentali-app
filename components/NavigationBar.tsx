@@ -1,6 +1,6 @@
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Platform } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '../ThemeContext';
 import { Colors } from '../constants/Colors';
 
@@ -15,13 +15,19 @@ export default function NavigationBar({ onMapPress, onProfilePress }: Navigation
   const colors = Colors[theme];
 
   return (
-    <View style={[styles.container, { 
-      backgroundColor: colors.background,
-      borderBottomColor: colors.cardBorder 
-    }]}>
+    <View style={[
+      styles.container, 
+      { 
+        backgroundColor: colors.background,
+        borderBottomColor: darkMode ? '#2D2D2D' : '#F3F4F6'
+      }
+    ]}>
       {/* Logo */}
       <View style={styles.leftSection}>
-        <View style={[styles.logoContainer, { backgroundColor: darkMode ? '#2D2D2D' : '#F5F3FF' }]}>
+        <View style={[
+          styles.logoContainer, 
+          { backgroundColor: darkMode ? '#1F1F1F' : '#F5F3FF' }
+        ]}>
           <MaterialCommunityIcons name="brain" size={22} color={colors.primary} />
         </View>
         <Text style={[styles.brandName, { color: colors.text }]}>Mentali</Text>
@@ -31,7 +37,10 @@ export default function NavigationBar({ onMapPress, onProfilePress }: Navigation
       <View style={styles.rightSection}>
         <TouchableOpacity 
           onPress={toggleTheme} 
-          style={[styles.iconButton, { backgroundColor: darkMode ? '#2D2D2D' : '#F5F3FF' }]}
+          style={[
+            styles.iconButton, 
+            { backgroundColor: darkMode ? '#1F1F1F' : '#F5F3FF' }
+          ]}
           activeOpacity={0.7}
         >
           <MaterialCommunityIcons
@@ -43,7 +52,10 @@ export default function NavigationBar({ onMapPress, onProfilePress }: Navigation
         
         <TouchableOpacity 
           onPress={onMapPress} 
-          style={[styles.iconButton, { backgroundColor: darkMode ? '#2D2D2D' : '#F5F3FF' }]}
+          style={[
+            styles.iconButton, 
+            { backgroundColor: darkMode ? '#1F1F1F' : '#F5F3FF' }
+          ]}
           activeOpacity={0.7}
         >
           <Feather name="globe" size={20} color={colors.primary} />
@@ -51,7 +63,10 @@ export default function NavigationBar({ onMapPress, onProfilePress }: Navigation
         
         <TouchableOpacity 
           onPress={onProfilePress} 
-          style={[styles.iconButton, { backgroundColor: darkMode ? '#2D2D2D' : '#F5F3FF' }]}
+          style={[
+            styles.iconButton, 
+            { backgroundColor: darkMode ? '#1F1F1F' : '#F5F3FF' }
+          ]}
           activeOpacity={0.7}
         >
           <Feather name="user" size={20} color={colors.primary} />
@@ -67,18 +82,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
   },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   logoContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 42,
+    height: 42,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -90,12 +105,12 @@ const styles = StyleSheet.create({
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 42,
+    height: 42,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
