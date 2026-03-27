@@ -19,23 +19,36 @@ interface Message {
 
 let conversationHistory: Message[] = [];
 
-// URL del backend - Usar Vercel API
-const API_URL = 'https://mentali-ai.vercel.app/api/chat';
-
-// Función para llamar a la IA con Groq
+// Función para llamar directamente a Groq API (GRATIS - 500k tokens/día)
 async function getAIResponse(userMessage: string, apiKey: string | null): Promise<string> {
   conversationHistory.push({ role: 'user', content: userMessage });
+  
+  // Si no hay API key, usar fallback inteligente
+  if (!apiKey) {
+    const fallback = getFallbackResponse(userMessage);
+    conversationHistory.push({ role: 'assistant', content: fallback });
+    return fallback;
+  }
   
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
     
-    const response = await fetch(API_URL, {
+    // Llamada directa a Groq API
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
       body: JSON.stringify({ 
-        messages: conversationHistory.slice(-10),
-        apiKey: apiKey
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...conversationHistory.slice(-10)
+        ],
+        temperature: 0.7,
+        max_tokens: 200
       }),
       signal: controller.signal,
     });
@@ -45,13 +58,13 @@ async function getAIResponse(userMessage: string, apiKey: string | null): Promis
     const data = await response.json();
     
     if (!response.ok) {
-      if (data.error?.includes('API key')) {
-        return '🔑 Necesitas configurar tu API key de Groq (gratis). Toca el botón ⚙️ arriba a la derecha.';
+      if (response.status === 401) {
+        return '🔑 Tu API key no es válida. Obtén una nueva en console.groq.com/keys (gratis). Toca ⚙️ arriba.';
       }
-      throw new Error(data.error || 'API error');
+      throw new Error(data.error?.message || 'API error');
     }
     
-    const aiResponse = data.response || 'Lo siento, intenta de nuevo.';
+    const aiResponse = data.choices?.[0]?.message?.content || 'Lo siento, intenta de nuevo.';
     conversationHistory.push({ role: 'assistant', content: aiResponse });
     return aiResponse;
     
@@ -64,6 +77,17 @@ async function getAIResponse(userMessage: string, apiKey: string | null): Promis
     return fallback;
   }
 }
+
+const SYSTEM_PROMPT = `Eres Mentali, un psicólogo virtual empático y profesional.
+
+REGLAS CRÍTICAS:
+1. Si te preguntan "¿y tú?" o "¿y a ti?", responde: "Como psicólogo virtual no tengo emociones propias, pero estoy aquí para escucharte. Hablemos de ti..."
+2. NUNCA digas "¡Me alegra!" cuando alguien te pregunte cómo estás.
+3. Siempre valida las emociones del usuario antes de dar consejos.
+4. Responde en español, máximo 80 palabras.
+5. Si detectas crisis (suicidio, autolesión), proporciona números de ayuda: España 024, México 800-290-0024, Argentina 135.
+
+Sé cálido, empático y profesional.`;
 
 // Fallback cuando la API no está disponible
 function getFallbackResponse(message: string): string {
